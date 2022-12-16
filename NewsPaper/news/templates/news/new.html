@@ -1,0 +1,16 @@
+{% extends 'default.html' %}
+
+{% load my_filters %}
+{% load my_tags %}
+
+{% block title %}
+New
+{% endblock title %}
+
+<!-- В контенте на странице мы выводим сам товар, идентификатор которого был передан в url -->
+{% block content %}
+<h1>{{ new.title|censor}}</h1>
+<h3>{% current_time '%d %b %Y' %}</h3>
+<hr>
+<h3>{{ new.text|censor}}</h3>
+{% endblock content %}
