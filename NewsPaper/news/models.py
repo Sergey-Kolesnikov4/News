@@ -11,11 +11,9 @@ class Author (models.Model):
         postRat = self.post_set.aggregate(postRating=Sum('rating'))
         pRat = 0
         pRat += postRat.get('postRating')
-
         commentRat = self.authorUser.comment_set.aggregate(commentRating=Sum('rating'))
         cRat = 0
         cRat += commentRat.get('commentRating')
-
         self.ratingAuthor = pRat * 3 + cRat
         self.save()
 
@@ -26,6 +24,7 @@ class Author (models.Model):
 class Category(models.Model):
     name = models.CharField(max_length=38,unique=True)
     description = models.TextField()
+    subscribers = models.ManyToManyField(User,related_name= 'categories')
 
     def __str__(self):
         return f'{self.name}'
@@ -48,11 +47,7 @@ class News (models.Model):
     rating = models.SmallIntegerField(default=0)
     dateCreation = models.DateTimeField(auto_now_add=True)
     categoryType = models.CharField(max_length=2,choices=CATEGORY_CHOICES,default=ARTICLE)
-    category = models.ForeignKey(
-        to='Category',
-        on_delete=models.CASCADE,
-        related_name='news',
-    )
+    category = models.ManyToManyField(Category)
 
     class Meta:
         verbose_name = 'Новость'
@@ -70,7 +65,10 @@ class News (models.Model):
         return f'{self.title} :{self.text}'
 
     def get_absolute_url(self):
-        return reverse('news_detail', args=[str(self.id)])
+        return f'/news/{self.id}'
+
+    def preview(self):
+        return f'{self.text[:124]}...'
 
 
 class Comment(models.Model):
@@ -91,5 +89,14 @@ class Comment(models.Model):
 
     def __str__(self):
         return f'{self.text}'
+
+
+
+
+
+
+
+
+
 
 

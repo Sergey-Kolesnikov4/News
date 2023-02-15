@@ -4,16 +4,13 @@
 {% load my_tags %}
 
 {% block title %}
-news
+News
 {% endblock title %}
 
 {% block content %}
-   <h1>Все новости</h1>
+<h1 class="text-center">Новости <span class="text-muted fs-6 fw-normal">Всего: {{ page_obj.paginator.count }} </span></h1>
+<h5>{% current_time %}</h5>
 <hr>
-{% if perms.news.add_product and perms.post.add_post %}
-<h6><a href="NW/create/">Добавить новость</a></h6>
-<h6><a href="AR/create/">Добавить статью</a></h6>
-{% endif %}
 
    {% if news %}
        <table>
@@ -22,6 +19,7 @@ news
                <td>Описание</td>
                <td>Дата публикации</td>
                <td>Автор</td>
+               <td>Категории</td>
                {% if perms.news.change_news or perms.post.change_post or perms.news.delete_news or perms.post.delete_post %}
                <td>Действия</td>
                {% endif %}
@@ -33,6 +31,11 @@ news
                <td>{{ new.text|truncatechars:20|censor }}</td>
                <td>{{ new.dateCreation }}</td>
                <td>{{ new.author }}</td>
+               <td>{% for category in new.category.all %}
+                   <a href = "{% url 'category_list' category.id %}">{{ category|truncatechars:15 }}</a>
+                    {% endfor %}
+               </td>
+               </td>
                {% if perms.news.change_news or perms.post.change_post %}
                <td>
                    <a href="{{ new.categoryType }}/{{ new.id }}/update/">Изменить/</a>

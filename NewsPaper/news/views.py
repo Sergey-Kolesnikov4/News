@@ -1,16 +1,18 @@
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.views.generic import ListView,DetailView,CreateView,UpdateView,DeleteView
 from django.urls import reverse_lazy
+from django.shortcuts import get_object_or_404,render
+from django.contrib.auth.decorators import login_required
 
 from .filters import NewsFilter
 from .forms import NewsForm,ArticleForm
-from .models import News
+from .models import News,Category
 
 
 
 class NewsList(ListView):
     model = News
-    ordering = 'title'
+    ordering = '-dateCreation'
     template_name = 'index.html'
     context_object_name = 'news'
     paginate_by = 5
@@ -19,7 +21,7 @@ class NewsList(ListView):
 
 class SearchList(ListView):
     model = News
-    ordering = 'title'
+    ordering = '-dateCreation'
     template_name = 'search.html'
     context_object_name = 'news'
     paginate_by = 5
@@ -41,7 +43,6 @@ class NewsDetail(DetailView):
     model = News
     template_name = 'new.html'
     context_object_name = 'new'
-    pk_url_kwarg = 'id'
 
 
 class NewsCreate(PermissionRequiredMixin,CreateView):
@@ -75,7 +76,7 @@ class NewsUpdate(PermissionRequiredMixin,UpdateView):
     form_class = NewsForm
     model = News
     template_name = 'create_news.html'
-    pk_url_kwarg = 'id'
+    raise_exception = True
 
 
 class ArticleUpdate(PermissionRequiredMixin,UpdateView):
@@ -83,7 +84,7 @@ class ArticleUpdate(PermissionRequiredMixin,UpdateView):
     form_class = ArticleForm
     model = News
     template_name = 'create_article.html'
-    pk_url_kwarg = 'id'
+    raise_exception = True
 
 
 class NewsDelete(PermissionRequiredMixin,DeleteView):
@@ -91,7 +92,7 @@ class NewsDelete(PermissionRequiredMixin,DeleteView):
     model = News
     template_name = 'delete_news.html'
     success_url = reverse_lazy('news_list')
-    pk_url_kwarg = 'id'
+    raise_exception = True
 
 
 class ArticleDelete(PermissionRequiredMixin,DeleteView):
@@ -99,5 +100,32 @@ class ArticleDelete(PermissionRequiredMixin,DeleteView):
     model = News
     template_name = 'delete_articles.html'
     success_url = reverse_lazy('news_list')
-    pk_url_kwarg = 'id'
+    raise_exception = True
+
+class CategoryList(ListView):
+    model = News
+    paginate_by = 5
+    template_name = 'category_list.html'
+    context_object_name = 'category_news_list'
+
+    def get_queryset(self):
+        self.category = get_object_or_404(Category,id = self.kwargs['pk'])
+        queryset = News.objects.filter(category = self.category).order_by('-dateCreation')
+        return queryset
+
+    def get_context_data(self,**kwargs):
+        context = super().get_context_data(**kwargs)
+        context['is_not_signed'] = self.request.user not in self.category.subscribers.all()
+        context['category'] = self.category
+        return context
+
+
+@login_required
+def subscribe(requests, pk):
+    user=requests.user
+    category=Category.objects.get(id=pk)
+    category.subscribers.add(user)
+    message='Вы успешно подписались на рассылку новостей категории'
+    return render (requests,'subscribe.html',{'category': category,'message':message})
+
 

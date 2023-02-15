@@ -1,0 +1,55 @@
+{% extends 'default.html' %}
+
+{% load my_filters %}
+{% load my_tags %}
+
+{% block title %}
+news
+{% endblock title %}
+
+{% block content %}
+   <h1>Все новости</h1>
+    <h4>{% current_time %}</h4>
+<hr>
+{% if perms.news.add_news %}
+<h6><a href="NW/create/">Добавить новость</a></h6>
+{% endif %}
+{% if perms.post.add_post %}
+<h6><a href="AR/create/">Добавить статью</a></h6>
+{% endif %}
+
+   {% if news %}
+       <table>
+           <tr>
+               <td>Заголовок</td>
+               <td>Описание</td>
+               <td>Дата публикации</td>
+               <td>Автор</td>
+               {% if perms.news.change_news or perms.post.change_post or perms.news.delete_news or perms.post.delete_post %}
+               <td>Действия</td>
+               {% endif %}
+
+           </tr>
+           {% for new in news %}
+           <tr>
+               <td> <a href="{{ new.id }}">{{new.title|truncatewords:3|censor}}</a> </td>
+               <td>{{ new.text|truncatechars:20|censor }}</td>
+               <td>{{ new.dateCreation }}</td>
+               <td>{{ new.author }}</td>
+               {% if perms.news.change_news or perms.post.change_post %}
+               <td>
+                   <a href="{{ new.categoryType }}/{{ new.id }}/update/">Изменить/</a>
+               </td>
+               {% endif %}
+               {% if perms.news.delete_news or perms.post.delete_post %}
+               <td><a href="{{ new.categoryType }}/{{ new.id }}/delete/">Удалить</a>
+               </td>
+               {% endif %}
+
+           </tr>
+           {% endfor %}
+
+       </table>
+   {% else %}
+       <h2>Новостей нет!</h2>
+   {% endif %}
