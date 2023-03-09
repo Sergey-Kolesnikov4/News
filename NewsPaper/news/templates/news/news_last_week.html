@@ -8,7 +8,7 @@
 <h2>Здравствуй! Новые статьи за последнюю неделю</h2>
 <ul>
     {% for new in news %}
-    <li><a href="{{ link }}{{ get_absolute_url }}">{{ new.title }}</a></li>
+    <li><a href="{{ link }}{{  new.get_absolute_url }}>{{ new.title }}</a></li>
     {% endfor %}
 </ul>
 <p>{{ text }}</p>

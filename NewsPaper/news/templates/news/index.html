@@ -13,6 +13,8 @@ News
 <hr>
 
    {% if news %}
+        {% load cache %}
+        {% cache 500 names %}
        <table>
            <tr>
                <td>Заголовок</td>
@@ -20,6 +22,7 @@ News
                <td>Дата публикации</td>
                <td>Автор</td>
                <td>Категории</td>
+       {% endcache %}
                {% if perms.news.change_news or perms.post.change_post or perms.news.delete_news or perms.post.delete_post %}
                <td>Действия</td>
                {% endif %}

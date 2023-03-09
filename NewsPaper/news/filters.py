@@ -3,6 +3,7 @@ from django.forms import DateTimeInput
 from .models import News,Category
 
 
+
 class NewsFilter(FilterSet):
     added_after = DateTimeFilter(
         field_name='dateCreation',

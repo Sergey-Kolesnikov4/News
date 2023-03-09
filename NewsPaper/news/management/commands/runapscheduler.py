@@ -21,9 +21,9 @@ logger = logging.getLogger(__name__)
 def my_job():
     today=datetime.datetime.now()
     last_week=today - datetime.timedelta(days=7)
-    news=News.objects.filter(created_at__gte=last_week)
+    news=News.objects.filter(dateCreation__gte=last_week)
     categories = set(news.values_list('category__name', flat=True))
-    subscribers = set(Category.object.filter(name__in=categories).values_list('subscribers__email'))
+    subscribers = set(Category.objects.filter(name__in=categories).values_list('subscribers__email',flat=True))
 
     html_content=render_to_string(
         'news_last_week.html',
@@ -60,7 +60,7 @@ class Command(BaseCommand):
         # добавляем работу нашему задачнику
         scheduler.add_job(
             my_job,
-            trigger=CronTrigger(day_of_week='sun',hour='21',minute='00'),
+            trigger=CronTrigger(day_of_week='sun',hour='12',minute='00'),
             # То же, что и интервал, но задача тригера таким образом более понятна django
             id="my_job",  # уникальный айди
             max_instances=1,
