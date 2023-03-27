@@ -1,0 +1,1 @@
+2023-03-27 14:34:41,470 WARNING log Forbidden (CSRF token missing.): /news/NW/create/
